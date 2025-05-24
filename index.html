@@ -15,7 +15,7 @@
     body {
       font-family: 'Poppins', sans-serif;
       height: 100vh;
-      background: linear-gradient(135deg, #1e3c72, #2a5298);
+      background: linear-gradient(135deg, #6ea1ff, #173974);
       display: flex;
       flex-direction: column;
       align-items: center;
@@ -26,39 +26,57 @@
     }
 
     .logo {
-      width: 33.33%;
+      width: 50%;
       height: auto;
       margin-bottom: 1.5rem;
+      transition: all 0.3s ease;
     }
 
     p {
-      font-size: 1.2rem;
+      font-size: 1.5rem;
       max-width: 600px;
-      margin-bottom: 2rem;
+      margin-bottom: 1.5rem;
+      margin-top: 1%;
       opacity: 0.9;
+      transition: all 0.3s ease;
     }
 
     .button {
-      background-color: white;
+      background-color: rgba(255, 255, 255, 0.541);
       color: #1e3c72;
       padding: 0.75rem 1.5rem;
-      font-size: 1rem;
+      margin: 1%;
+      font-size: 1.5rem;
       font-weight: 600;
       border: none;
       border-radius: 8px;
       cursor: pointer;
       transition: all 0.3s ease;
       text-decoration: none;
+      width: 60%;
     }
 
     .button:hover {
-      background-color: #e0e0e0;
+      background-color: #ffffffa6;
+      border-radius: 15px;
+      width: 90%;
+      font-size: 3rem;
     }
+
+    p:hover {
+      font-size: 2rem;
+    }
+
+    .logo:hover {
+      width: 70%;
+    }
+
   </style>
 </head>
 <body>
   <img src="harcheruklogo.png" alt="Harcher Logo" class="logo" />
-  <p>This website hosts all my current projects that are portable to web. Other projects are most likely downloadable via github.</p>
-  <a href="/earthsim" class="button">Unity Earth Sim</a>
+  <p>This website hosts all my current projects that are ported to webGL. Other projects are most likely availiable for download via github.</p>
+  <a href="/earthsim/earthsim.html" class="button">Unity Earth Sim</a>
+  <a href="/tictactoe3d/index.html" class="button">3D Tic Tac Toe</a>
 </body>
 </html>
