@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Launchpad</title>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;700&display=swap" rel="stylesheet">
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: 'Poppins', sans-serif;
+      height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      text-align: center;
+      padding: 2rem;
+
+      background: url('nebulabackground.jpg') no-repeat center center fixed;
+      background-size: 200%;
+      animation: panBackground 120s linear infinite;
+    }
+
+    @keyframes panBackground {
+      0% { background-position: 0% 0%; }
+      50% { background-position: 100% 100%; }
+      100% { background-position: 0% 0%; }
+    }
+
+    .center-container {
+      position: relative;
+      width: 400px;
+      height: 400px;
+    }
+
+    h1 {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      z-index: 2;
+      font-size: 2rem;
+    }
+
+    .radial-button {
+      position: absolute;
+      padding: 1rem 1rem;
+      background-color: rgba(255, 255, 255, 0.15);
+      color: white;
+      border: 1px solid white;
+      border-radius: 5px;
+      text-decoration: none;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.2rem;
+      font-weight: bold;
+      transition: background-color 0.3s;
+      white-space: nowrap;
+    }
+
+    .radial-button:hover {
+      background-color: rgba(255, 255, 255, 0.3);
+    }
+  </style>
+</head>
+<body>
+  <div class="center-container" id="launchpad">
+    <h1>Launchpad</h1>
+    <!-- Buttons will be injected here -->
+  </div>
+
+  <script>
+    // links here
+    const links = [
+    { title: 'GitHub', url: 'https://github.com' },
+    { title: 'Desmos', url: 'https://www.desmos.com/calculator' },
+    { title: 'ChatGPT', url: 'https://chatgpt.com' },
+    { title: 'Gradient Gen', url: 'https://mdigi.tools/gradient-generator/' },
+    { title: 'Bandlab', url: 'https://bandlab.com' },
+    { title: 'MSOffice', url: 'https://office.com' },
+    { title: 'Onedrive', url: 'https://onedrive.com' },
+    ];
+
+    const container = document.getElementById('launchpad');
+    const total = links.length;
+    const radius = 260; // radius in px from center to button center
+
+    links.forEach((link, index) => {
+      // Calculate angle for each button
+      const angle = (index / total) * (2 * Math.PI) - Math.PI / 2;
+      const x = radius * Math.cos(angle);
+      const y = radius * Math.sin(angle);
+
+      // Create anchor element
+      const a = document.createElement('a');
+      a.href = link.url;
+      a.textContent = link.title;
+      a.className = 'radial-button';
+
+      // Position it
+      a.style.transform = `translate(-50%, -50%) translate(${x}px, ${y}px)`;
+      a.style.top = '50%';
+      a.style.left = '50%';
+
+      container.appendChild(a);
+    });
+  </script>
+</body>
+</html>

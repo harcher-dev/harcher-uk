@@ -25,7 +25,7 @@
 
       background: url('nebulabackground.jpg') no-repeat center center fixed;
       background-size: 200%;
-      animation: panBackground 60s linear infinite;
+      animation: panBackground 120s linear infinite;
     }
 
     @keyframes panBackground {
@@ -57,7 +57,7 @@
     }
 
     .button {
-      background-color: rgba(255, 255, 255, 0.2);
+      background-color: rgba(255, 255, 255, 0.76);
       color: #1e3c72;
       padding: 0.75rem 1.5rem;
       margin: 1%;
@@ -69,7 +69,11 @@
       transition: all 0.3s ease;
       text-decoration: none;
       width: 60%;
-      opacity: 0.8;
+      opacity: 1;
+    }
+
+    .hidecursor {
+      cursor: default;
     }
 
     .button:hover {
@@ -77,7 +81,7 @@
       border-radius: 15px;
       width: 90%;
       font-size: 3rem;
-      opacity: 1;
+      opacity: 0.5;
     }
 
     p:hover {
@@ -85,13 +89,14 @@
     }
 
     .logo:hover {
-      width: 70%;
+      width: 55%;
+      opacity: 80%;
     }
 
   </style>
 </head>
 <body>
-  <img src="harcheruklogo.png" alt="Harcher Logo" class="logo" />
+  <a href="/nebulahomescreen.html" class="hidecursor"><img src="harcheruklogo.png" alt="Harcher Logo" class="logo"/></a>
   <p>This website hosts all my current projects that are ported to webGL. Other projects are most likely availiable for download via github.</p>
   <a href="/earthsim/earthsim.html" class="button">Unity Earth Sim</a>
   <a href="/tictactoe3d/index.html" class="button">3D Tic Tac Toe</a>
