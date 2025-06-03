@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Music</title>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;700&display=swap" rel="stylesheet">
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: 'Poppins', sans-serif;
+      height: 100vh;
+      background: url('https://github.com/harcher-dev/harcher-uk/blob/main/nebulabackground.jpg') repeat;
+      background-size: cover;
+      animation: moveBackground 60s linear infinite;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 2rem;
+      color: white;
+      overflow: hidden;
+    }
+
+    @keyframes moveBackground {
+      0% { background-position: 0 0; }
+      100% { background-position: 1000px 1000px; }
+    }
+
+    .embed-container {
+      background-color: rgba(255, 255, 255, 0.1);
+      padding: 2rem;
+      border-radius: 16px;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+      max-width: 800px;
+      width: 100%;
+      transform-origin: center;
+      animation: swivel 120s linear infinite;
+    }
+
+    @keyframes swivel {
+      0% { transform: rotateY(0deg); }
+      100% { transform: rotateY(360deg); }
+    }
+
+    .embed-container iframe {
+      border-radius: 8px;
+    }
+
+    .embed-container div {
+      margin-top: 0.5rem;
+    }
+  </style>
+</head>
+<body>
+  <div class="embed-container">
+    <iframe width="100%" height="450" scrolling="no" frameborder="no" allow="autoplay"
+      src="https://w.soundcloud.com/player/?url=https%3A//api.soundcloud.com/playlists/2030961573&color=%23ff5500&auto_play=false&hide_related=false&show_comments=true&show_user=true&show_reposts=false&show_teaser=true">
+    </iframe>
+    <div style="font-size: 10px; color: #cccccc; line-break: anywhere; word-break: normal; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; font-family: Interstate, Lucida Grande, Lucida Sans Unicode, Lucida Sans, Garuda, Verdana, Tahoma, sans-serif; font-weight: 100;">
+      <a href="https://soundcloud.com/harcher1" title="Harcher" target="_blank" style="color: #cccccc; text-decoration: none;">Harcher</a> ·
+      <a href="https://soundcloud.com/harcher1/sets/pytlak" title="Pytlak OST" target="_blank" style="color: #cccccc; text-decoration: none;">Pytlak OST</a>
+    </div>
+  </div>
+</body>
+</html>
