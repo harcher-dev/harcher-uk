@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Contact - Harcher Software</title>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --font: 'Poppins', sans-serif;
+      --text-color: #fff;
+      --button-bg: rgba(58, 58, 58, 0.205);
+      --button-hover-bg: rgba(65, 65, 65, 0.137);
+      --button-color: #ffffff;
+      --topbar-bg: rgba(211, 211, 211, 0.048);
+      --border-color: rgba(211, 211, 211, 0.4);
+      --topbar-height: 60px;
+      --transition: all 0.3s ease;
+    }
+
+    *:not(html):not(body):not(p):not(.logo-text) {
+      border: 1px solid var(--border-color);
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+    html, body {
+      height: 100%;
+    }
+    body {
+      font-family: var(--font);
+      color: var(--text-color);
+      text-align: center;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+      padding-top: var(--topbar-height);
+      background: url('nebulabackground.jpg') no-repeat center center/cover fixed;
+      animation: panBackground 60s linear infinite;
+    }
+    @keyframes panBackground {
+      0%   { background-position: 0%   0%; }
+      50%  { background-position: 100% 100%; }
+      100% { background-position: 0%   0%; }
+    }
+
+    header {
+      position: fixed;
+      top: 0; left: 0;
+      width: 100%; height: var(--topbar-height);
+      background: var(--topbar-bg);
+      display: flex;
+      align-items: center;
+      justify-content: flex-end;
+      padding: 0 1rem;
+      backdrop-filter: blur(8px);
+      z-index: 1000;
+    }
+    header .top-button {
+      background: var(--button-bg);
+      color: var(--button-color);
+      border-radius: 8px;
+      padding: 0.5rem 1rem;
+      margin-left: 0.5rem;
+      font-size: 1rem;
+      font-weight: 600;
+      text-decoration: none;
+      cursor: pointer;
+      transition: var(--transition);
+      backdrop-filter: blur(8px);
+    }
+    header .top-button:hover {
+      background: var(--button-hover-bg);
+      transform: scale(1.1);
+      -webkit-backdrop-filter: blur(12px);
+      backdrop-filter: blur(12px);
+    }
+
+    .logo-text {
+      position: relative;
+      font-size: 3rem;
+      font-weight: 700;
+      color: var(--text-color);
+      text-decoration: none;
+      margin-bottom: 1.5rem;
+      transition: var(--transition);
+      -webkit-text-stroke: 1px var(--border-color);
+      z-index: 2;
+      white-space: nowrap;
+    }
+    .logo-text:hover {
+      font-size: 3.05rem;
+      opacity: 0.8;
+    }
+    .logo-text::before {
+      content: attr(data-text);
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%) scale(1.04);
+      font-size: 3rem;
+      font-weight: 700;
+      color: var(--text-color);
+      backdrop-filter: blur(4px);
+      opacity: 0.4;
+      z-index: 1;
+    }
+
+    p {
+      font-size: 1.5rem;
+      max-width: 600px;
+      margin: 1rem 0;
+      opacity: 0.7;
+      transition: var(--transition);
+    }
+    p:hover {
+      opacity:1;
+    }
+
+    .email-link {
+      display: inline-block;
+      background: var(--button-bg);
+      color: var(--button-color);
+      padding: 0.75rem 1.5rem;
+      margin-top: 1rem;
+      font-size: 1.5rem;
+      font-weight: 600;
+      border-radius: 8px;
+      text-decoration: none;
+      transition: var(--transition);
+      backdrop-filter: blur(8px);
+    }
+    .email-link:hover {
+      background: var(--button-hover-bg);
+      border-radius: 15px;
+      font-size: 2rem;
+      opacity: 0.5;
+      -webkit-backdrop-filter: blur(20px);
+      backdrop-filter: blur(20px);
+    }
+
+    .hidecursor {
+      cursor: default;
+    }
+
+    @media (max-width: 600px) {
+      body {
+        background-size: 350%;
+      }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <a href="/" class="top-button">Home</a>
+    <a href="/launchpad.html" class="top-button">Launchpad</a>
+    <a href="/contact.html" class="top-button">Contact</a>
+  </header>
+
+  <a href="/launchpad.html" class="logo-text hidecursor" data-text="Harcher Software">
+    Harcher Software
+  </a>
+
+  <p>Feel free to reach out to me via email with any questions, feedback, or collaboration ideas.</p>
+
+  <a href="mailto:harchersoftware@gmail.com" class="email-link">harchersoftware@gmail.com</a>
+</body>
+</html>
