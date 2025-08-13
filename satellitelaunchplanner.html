@@ -4,650 +4,323 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>Satellite Launch Planner</title>
-
-  <meta name="description" content="Satellite Launch Planner - single-file, production-ready (no CDNs / Babel / Tailwind CDN / Recharts)." />
-
   <style>
-    /* ---------- Layout & Theme (Tailwind-like but handcrafted) ---------- */
     :root{
       --bg:#0f1724;
-      --panel: rgba(255,255,255,0.06);
-      --panel-border: rgba(255,255,255,0.09);
-      --muted: rgba(255,255,255,0.7);
-      --glass: rgba(255,255,255,0.03);
-      --success: #10B981;
-      --accent1: rgba(192,38,211,0.18);
-      --accent2: rgba(6,182,212,0.12);
-      --card-radius: 20px;
-      font-family: Inter, ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
-    }
-    html,body{height:100%;}
-    body{
-      margin:0;
-      min-height:100%;
-      background: radial-gradient(1200px 800px at -10% 10%, var(--accent1) 0%, rgba(0,0,0,0) 18%), radial-gradient(1000px 700px at 110% 70%, var(--accent2) 0%, rgba(0,0,0,0) 22%), linear-gradient(180deg,#071028 0%, #0f1724 100%);
-      color:#E6EEF8;
-      -webkit-font-smoothing:antialiased;
-      -moz-osx-font-smoothing:grayscale;
-      padding:28px 18px;
-      box-sizing:border-box;
+      --glass-1:rgba(255,255,255,0.06);
+      --glass-2:rgba(255,255,255,0.04);
+      --accent-start:#7b61ff;
+      --accent-end:#4fd1c5;
+      --accent:linear-gradient(135deg,var(--accent-start),var(--accent-end));
+      --muted:rgba(255,255,255,0.65);
+      --glass-border:rgba(255,255,255,0.08);
+      --glass-blur:12px;
+      --glass-radius:18px;
+      --text:#e6eef8; /* primary text color (light) */
+      --btn-active-text:#042028; /* dark text used only on very light backgrounds if needed */
+      font-family:Inter, ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
     }
 
-    .container{max-width:1200px;margin:0 auto;display:grid;grid-template-columns:1fr;gap:18px;}
-    @media(min-width:1024px){ .container{grid-template-columns:380px 1fr;} }
+    html,body{height:100%;background:radial-gradient(1200px 400px at 10% 10%, rgba(127,90,255,0.12), transparent 6%), radial-gradient(800px 300px at 90% 90%, rgba(79,209,197,0.06), transparent 8%), var(--bg); color:var(--text); margin:0}
+    .wrap{max-width:1200px;margin:28px auto;padding:26px;backdrop-filter: blur(var(--glass-blur));background:linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));border:1px solid var(--glass-border);border-radius:24px;box-shadow:0 8px 30px rgba(2,6,23,0.6)}
+    header{display:flex;align-items:center;gap:18px}
+    .logo{width:68px;height:68px;border-radius:14px;background:linear-gradient(135deg, rgba(255,255,255,0.06), rgba(255,255,255,0.02));display:flex;align-items:center;justify-content:center;box-shadow:inset 0 -6px 30px rgba(255,255,255,0.02)}
+    h1{margin:0;font-size:20px;letter-spacing:0.2px;color:var(--text)}
+    p.lead{margin:6px 0 0;color:var(--muted);font-size:13px}
 
-    header{margin-bottom:4px}
-    h1{font-size:20px;margin:0 0 6px 0}
-    p.lead{margin:0;color:var(--muted);font-size:13px}
+    .grid{display:grid;grid-template-columns:380px 1fr;gap:18px;margin-top:18px}
+    .panel{padding:16px;border-radius:var(--glass-radius);background:linear-gradient(180deg,var(--glass-1),var(--glass-2));border:1px solid var(--glass-border)}
+    label{display:block;font-size:13px;color:var(--muted);margin-bottom:6px}
+    input[type=number],input[type=date]{width:100%;padding:10px;border-radius:10px;border:1px solid rgba(255,255,255,0.06);background:transparent;color:var(--text);font-size:14px}
 
-    .card{
-      background:var(--panel);
-      border:1px solid var(--panel-border);
-      border-radius:var(--card-radius);
-      padding:16px;
-      box-shadow: 0 6px 24px rgba(2,6,23,0.45);
-    }
-    .row{display:flex;gap:10px;align-items:center}
-    .space-y{display:block;gap:12px}
-    .muted{color:var(--muted);font-size:13px}
+    /* Buttons: default state uses light text for contrast on dark background */
+    .btn{display:inline-flex;align-items:center;gap:8px;padding:8px 12px;border-radius:12px;background:linear-gradient(90deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));border:1px solid rgba(255,255,255,0.04);cursor:pointer;color:var(--text);font-weight:500}
 
-    /* inputs */
-    input[type="number"], input[type="text"], select {
-      background: rgba(255,255,255,0.03);
-      border: 1px solid rgba(255,255,255,0.06);
-      color:inherit;padding:8px 10px;border-radius:10px;font-size:14px;
-    }
-    input[type="range"]{ width:100% }
-    label.small{display:block;font-size:12px;color:var(--muted);margin-bottom:6px}
+    /* Primary action (high-contrast) */
+    .btn.primary{background:linear-gradient(90deg,var(--accent-start),var(--accent-end));color:#03121a;border:none;padding:10px 14px;font-weight:700;box-shadow:0 8px 24px rgba(79,209,197,0.12)}
 
-    /* buttons */
-    .btn{background:white;color:#071028;border-radius:10px;padding:8px 12px;font-weight:600;border:none;cursor:pointer}
-    .btn.ghost{background:transparent;color:inherit;border:1px solid rgba(255,255,255,0.06)}
-    .pill{display:inline-block;padding:6px 10px;border-radius:999px;background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.04);font-size:13px;cursor:pointer}
+    /* Toggle buttons: neutral by default, highlighted when active (.primary) */
+    .btn.toggle{background:transparent;border:1px solid rgba(255,255,255,0.06);padding:8px 10px;color:var(--text)}
+    .btn.toggle.primary{background:linear-gradient(90deg,var(--accent-start),var(--accent-end));color:#03121a;border:none;box-shadow:0 6px 18px rgba(127,90,255,0.12)}
 
-    /* provider list */
-    .provider{display:flex;flex-direction:column;gap:8px;padding:12px;border-radius:12px;background:rgba(255,255,255,0.02);border:1px solid rgba(255,255,255,0.03)}
-    .provider .meta{display:flex;justify-content:space-between;align-items:center}
-    .provider .meta .left{display:flex;gap:10px;align-items:center}
-    .badge{font-size:12px;padding:4px 8px;border-radius:999px;background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.05)}
-    .small{font-size:13px;color:var(--muted)}
+    /* Accessibility: keyboard focus */
+    .btn:focus{outline:3px solid rgba(127,90,255,0.18);outline-offset:3px}
 
-    /* charts */
-    .chart{background:transparent}
+    .btn-group{display:flex;flex-wrap:wrap;gap:8px;margin-top:8px}
+    .small{font-size:12px;color:var(--muted)}
+    .big{font-size:18px;color:var(--text);font-weight:700}
 
-    /* footer actions */
-    .actions{display:flex;gap:10px;align-items:center;margin-top:6px}
-    .right{margin-left:auto}
+    /* orbit controls */
+    .orbit-presets{display:flex;flex-wrap:wrap;gap:8px}
+    .slider{width:100%;}
+    .globe-wrap{height:420px;border-radius:14px;overflow:hidden;border:1px solid rgba(255,255,255,0.03);background:linear-gradient(180deg, rgba(255,255,255,0.01), rgba(255,255,255,0.00));}
+    #globe{width:100%;height:100%}
 
-    /* orbit sketch */
-    .orbit-sketch{width:100%;height:220px;display:block}
+    .results{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:12px;margin-top:10px}
+    .card{padding:12px;border-radius:14px;background:linear-gradient(180deg, rgba(255,255,255,0.01), rgba(255,255,255,0.00));border:1px solid rgba(255,255,255,0.04);min-height:120px;color:var(--text)}
+    .card h3{margin:0;color:var(--text);font-size:15px}
+    .meta{font-size:12px;color:var(--muted)}
 
-    /* sticky CTA */
-    .sticky-cta{position:fixed;right:20px;bottom:20px;z-index:60}
-    .small-note{font-size:12px;color:rgba(255,255,255,0.55);}
+    /* capacity bar */
+    .bar{height:10px;background:linear-gradient(90deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));border-radius:999px;margin-top:8px;overflow:hidden}
+    .bar > i{display:block;height:100%;background:linear-gradient(90deg,var(--accent-start),var(--accent-end));width:40%}
 
-    /* responsive tweaks */
-    @media(max-width:640px){
-      .card{padding:12px}
-      .container{padding-bottom:120px}
-    }
+    @media (max-width:980px){.grid{grid-template-columns:1fr} .globe-wrap{height:300px}}
   </style>
 </head>
 <body>
-  <div class="container">
-    <!-- Left column: inputs -->
-    <div>
-      <header>
+  <div class="wrap">
+    <header>
+      <div class="logo" aria-hidden>
+        <svg width="42" height="42" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M2 12c0 5.523 4.477 10 10 10s10-4.477 10-10S17.523 2 12 2 2 6.477 2 12z" fill="url(#g)" opacity="0.12"/><defs><linearGradient id="g" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#7b61ff"/><stop offset="1" stop-color="#4fd1c5"/></linearGradient></defs></svg>
+      </div>
+      <div>
         <h1>Satellite Launch Planner</h1>
-        <p class="lead">Choose satellite configuration and get launch recommendations — providers, costs, lead time, and sites.</p>
-      </header>
+        <p class="lead">DISCLAIMER: This project was made with generative AI, I do not claim to have written any of the code.</p>
+      </div>
+    </header>
 
-      <section class="card" id="mission-card">
-        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">
-          <div>
-            <div style="font-weight:700">Mission Setup</div>
-            <div class="small muted">Define payload, orbit and constraints</div>
-          </div>
-          <button id="reset-btn" class="btn ghost">Reset</button>
+    <div class="grid">
+      <div class="panel">
+        <label>Payload mass (kg)</label>
+        <input id="payload" type="number" min="0" value="150" />
+
+        <div style="height:12px"></div>
+        <label>Orbit presets</label>
+        <div class="btn-group orbit-presets" id="orbitPresets">
+          <button class="btn toggle" data-preset="LEO">LEO (160–2,000 km)</button>
+          <button class="btn toggle" data-preset="SSO">SSO (Sun-synchronous)</button>
+          <button class="btn toggle" data-preset="Polar">Polar</button>
+          <button class="btn toggle" data-preset="MEO">MEO (2,000–35,786 km)</button>
+          <button class="btn toggle" data-preset="GTO">GTO (Transfer to GEO)</button>
+          <button class="btn toggle" data-preset="GEO">GEO (36,786 km circular)</button>
+          <button class="btn toggle" data-preset="HEO">HEO / Molniya</button>
+          <button class="btn toggle" data-preset="ISS">ISS Rendezvous (51.6°)</button>
         </div>
 
-        <div style="display:grid;gap:10px">
-          <div>
-            <label class="small">Mission name</label>
-            <input id="mission-input" type="text" value="Aurora-1" />
-          </div>
+        <div style="height:12px"></div>
+        <label>Custom orbit parameters</label>
+        <div class="small">Altitude (perigee) <span id="altVal">600</span> km</div>
+        <input id="alt" class="slider" type="range" min="160" max="35786" value="600" />
+        <div class="small" style="margin-top:8px">Inclination <span id="incVal">97</span>°</div>
+        <input id="inc" class="slider" type="range" min="0" max="180" value="97" />
+        <div class="small" style="margin-top:8px">Eccentricity <span id="eccVal">0.00</span></div>
+        <input id="ecc" class="slider" type="range" min="0" max="0.9" step="0.01" value="0" />
 
-          <div>
-            <label class="small">Payload mass (kg)</label>
-            <div style="display:flex;gap:8px;align-items:center">
-              <input id="payload-input" type="number" min="1" value="120" style="width:110px" />
-              <input id="payload-range" type="range" min="1" max="45000" value="120" />
-            </div>
-          </div>
+        <div style="height:12px"></div>
+        <label>Priority</label>
+        <div class="btn-group" id="priorityGroup">
+          <button class="btn toggle" data-priority="cost">Lowest cost</button>
+          <button class="btn toggle" data-priority="capacity">Max capacity</button>
+          <button class="btn toggle" data-priority="schedule">Earliest (theoretical)</button>
+        </div>
 
-          <div>
-            <label class="small">Orbit</label>
-            <div id="orbit-buttons" style="display:flex;flex-wrap:wrap;gap:8px">
-              <!-- JS inserts orbit buttons -->
-            </div>
-            <div id="orbit-note" class="muted small" style="margin-top:8px"></div>
-          </div>
+        <div style="height:12px"></div>
+        <label>Preferred launch date</label>
+        <input id="date" type="date" />
 
-          <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
-            <div>
-              <label class="small">Altitude (km)</label>
-              <div style="display:flex;gap:8px;align-items:center">
-                <input id="altitude-input" type="number" value="525" style="width:90px" />
-                <input id="altitude-range" type="range" min="200" max="2000" value="525" />
-              </div>
-            </div>
-            <div>
-              <label class="small">Inclination (°)</label>
-              <div style="display:flex;gap:8px;align-items:center">
-                <input id="inclination-input" type="number" value="97" style="width:90px" />
-                <input id="inclination-range" type="range" min="0" max="120" value="97" />
-              </div>
-            </div>
-          </div>
+        <div style="height:12px"></div>
+        <div style="display:flex;gap:10px"><button class="btn primary" id="planBtn">Plan launch</button><button class="btn" id="resetBtn">Reset</button></div>
 
-          <div style="display:flex;gap:8px;align-items:center">
-            <label class="small" style="min-width:70px">Mode</label>
-            <div id="mode-toggle" style="display:flex;gap:8px">
-              <div data-mode="rideshare" class="pill">Rideshare</div>
-              <div data-mode="dedicated" class="pill">Dedicated</div>
-            </div>
-          </div>
+        <div style="height:12px"></div>
+        <div class="small note">Providers included: SpaceX (Falcon 9 / Heavy / rideshare), Rocket Lab (Electron), Arianespace (Vega-C), ISRO (PSLV), ULA (Vulcan). Use results as theoretical guidance only.</div>
+      </div>
 
-          <div>
-            <label class="small">Budget (USD)</label>
-            <div style="display:flex;gap:8px;align-items:center">
-              <input id="budget-input" type="number" value="6000000" style="width:160px" />
-              <input id="budget-range" type="range" min="1000000" max="150000000" step="500000" value="6000000" />
-            </div>
+      <div class="panel">
+        <div style="display:flex;gap:12px;align-items:center">
+          <div style="flex:1">
+            <div class="small">Selected orbit</div>
+            <div id="selectedOrbit" class="big">LEO — 600 km, 97°</div>
           </div>
-
-          <div style="display:flex;gap:8px">
-            <div style="flex:1">
-              <label class="small">NET (months)</label>
-              <input id="net-input" type="number" value="7" min="1" max="24" />
-            </div>
-            <div style="flex:1">
-              <label class="small">Risk tolerance</label>
-              <input id="risk-range" type="range" min="0" max="1" step="0.05" value="0.3" />
+          <div style="width:360px">
+            <div class="globe-wrap">
+              <div id="globe"></div>
             </div>
           </div>
         </div>
-      </section>
 
-      <section class="card" style="margin-top:14px">
-        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">
-          <div><strong>Orbit Blueprint</strong><div class="small muted">Quick visual & parameters</div></div>
-          <div id="orbit-badge" class="badge">SSO</div>
-        </div>
+        <div style="height:12px"></div>
+        <div id="results" class="results"></div>
 
-        <svg class="orbit-sketch" id="orbit-sketch" viewBox="0 0 220 220" aria-hidden="true"></svg>
-
-        <div style="display:flex;gap:12px;margin-top:10px">
-          <div class="small muted">Altitude:<div style="font-weight:700" id="orbit-alt">525 km</div></div>
-          <div class="small muted">Inclination:<div style="font-weight:700" id="orbit-inc">97°</div></div>
-          <div class="small muted">Period:<div style="font-weight:700" id="orbit-period">~95 min</div></div>
-        </div>
-      </section>
-
-      <div class="sticky-cta">
-        <button class="btn" id="generate-full">Generate Full Plan</button>
+        <div style="height:8px"></div>
+        <div class="small">Tip: pick a preset then fine-tune altitude/inclination. The globe will draw a simplified orbital track (circular / near-circular) to visualise groundtrack inclination and altitude.</div>
       </div>
     </div>
 
-    <!-- Right column: recommendations + analytics -->
-    <div>
-      <section class="card" style="margin-bottom:12px">
-        <div style="display:flex;justify-content:space-between;align-items:center">
-          <div><strong>Launch Recommendations</strong><div class="small muted">Providers ranked for your scenario</div></div>
-          <div class="small muted">Cost range: <span id="cost-range">—</span></div>
-        </div>
-
-        <div id="providers-list" style="margin-top:12px;display:grid;gap:12px">
-          <!-- JS injects provider cards -->
-        </div>
-
-        <div style="margin-top:12px;display:flex;align-items:center">
-          <button id="print-btn" class="btn">Print Plan</button>
-          <div class="right small muted">This tool provides planning estimates only.</div>
-        </div>
-      </section>
-
-      <section class="card">
-        <div style="display:flex;justify-content:space-between;align-items:center">
-          <div><strong>Cost & Capacity Analytics</strong><div class="small muted">Simple SVG charts</div></div>
-        </div>
-
-        <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:12px">
-          <div class="card" style="padding:10px;background:transparent;border:none">
-            <svg id="bar-chart" width="100%" height="160" viewBox="0 0 320 160"></svg>
-          </div>
-          <div class="card" style="padding:10px;background:transparent;border:none">
-            <svg id="pie-chart" width="100%" height="160" viewBox="0 0 160 160"></svg>
-          </div>
-        </div>
-      </section>
-    </div>
+    <footer style="margin-top:12px;color:var(--muted);font-size:12px"><i>Data correct as of July 2025.</i></footer>
   </div>
 
+  <!-- three.js from CDN -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r152/three.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r152/examples/js/controls/OrbitControls.min.js"></script>
+
   <script>
-    /***** Data & Logic (ported from your App.jsx) *****/
-    const ORBITS = [
-      { key: "LEO", name: "LEO (Low Earth Orbit)", defaultAlt: 550, range: [200, 2000], typicalInc: [0, 98], notes: "Great for Earth observation and comms. Lower radiation, frequent launch windows." },
-      { key: "SSO", name: "SSO (Sun-Synchronous)", defaultAlt: 525, range: [450, 800], typicalInc: [96, 99], notes: "Sun-synchronous for consistent local time imaging passes." },
-      { key: "MEO", name: "MEO (Medium Earth Orbit)", defaultAlt: 20000, range: [2000, 35000], typicalInc: [0, 65], notes: "Navigation constellations and some comms." },
-      { key: "GTO", name: "GTO (Geostationary Transfer)", defaultAlt: 35786, range: [250, 35786], typicalInc: [0, 28], notes: "Transfer to GEO using onboard propulsion or kick stage." },
-      { key: "GEO", name: "GEO (Geostationary)", defaultAlt: 35786, range: [35786, 35786], typicalInc: [0, 5], notes: "Continuous coverage of a region; high latency, high Δv to reach." },
-      { key: "HEO", name: "HEO (Molniya/Tundra)", defaultAlt: 40000, range: [1000, 50000], typicalInc: [63, 63.5], notes: "Highly-elliptical for high-latitude dwell time." },
+    // --- provider dataset (kept from previous version) ---
+    const providers = [
+      {id:'falcon9', name:'Falcon 9', provider:'SpaceX', payload:{LEO:22800,SSO:20000,GTO:8300}, price:69750000, notes:'Reusable two-stage; frequent flights; rideshare program available.'},
+      {id:'falconheavy', name:'Falcon Heavy', provider:'SpaceX', payload:{LEO:63800,SSO:50000,GTO:26700}, price:97000000, notes:'Heavy-lift — best for very large single payloads.'},
+      {id:'electron', name:'Electron', provider:'Rocket Lab', payload:{LEO:300,SSO:300,GTO:150}, price:7500000, notes:'Small-sat specialist; dedicated smallsat launch option.'},
+      {id:'vegac', name:'Vega-C', provider:'Arianespace/Avio', payload:{LEO:2300,SSO:2300,GTO:900}, price:37000000, notes:'European small/medium launcher; good for single small satellites and SSMS rideshare.'},
+      {id:'pslv', name:'PSLV (generic)', provider:'ISRO', payload:{LEO:3500,SSO:1500,GTO:1200}, price:21000000, notes:'Reliable and cost-competitive for small/medium payloads. Variant-dependent.'},
+      {id:'vulcan', name:'Vulcan Centaur', provider:'United Launch Alliance', payload:{LEO:20000,SSO:18000,GTO:6500}, price:110000000, notes:'Heavy/medium lift with configurable SRBs; designed for government and commercial customers.'}
     ];
 
-    const PROVIDERS = [
-      { name: "SpaceX Falcon 9", id: "falcon9", reliability: 0.99, dedicatedBaseUSD: 65000000, rideshareUSDkg: 5500, leadMonths: 6, sites: ["CCSFS SLC-40 (FL)", "KSC LC-39A (FL)", "VAFB SLC-4E (CA)"], capacities: { LEO: 22800, SSO: 16000, MEO: 8000, GTO: 8300, GEO: 3500, HEO: 4000 } },
-      { name: "Rocket Lab Electron", id: "electron", reliability: 0.93, dedicatedBaseUSD: 7500000, rideshareUSDkg: 25000, leadMonths: 5, sites: ["Māhia LC-1 (NZ)", "VAFB LC-2 (CA)", "Wallops LC-2 (VA)"], capacities: { LEO: 300, SSO: 200, MEO: 50, GTO: 50, GEO: 0, HEO: 80 } },
-      { name: "Rocket Lab Neutron", id: "neutron", reliability: 0.90, dedicatedBaseUSD: 50000000, rideshareUSDkg: 12000, leadMonths: 9, sites: ["MARS Pad-0A (VA)"], capacities: { LEO: 13000, SSO: 8000, MEO: 4000, GTO: 6000, GEO: 2000, HEO: 2500 } },
-      { name: "Arianespace Ariane 6", id: "ariane6", reliability: 0.98, dedicatedBaseUSD: 90000000, rideshareUSDkg: 14000, leadMonths: 9, sites: ["CSG ELA-4 (GUF)"], capacities: { LEO: 21000, SSO: 15000, MEO: 8000, GTO: 10000, GEO: 4500, HEO: 5000 } },
-      { name: "ISRO PSLV", id: "pslv", reliability: 0.95, dedicatedBaseUSD: 30000000, rideshareUSDkg: 18000, leadMonths: 8, sites: ["Satish Dhawan (IND)"], capacities: { LEO: 3800, SSO: 1600, MEO: 800, GTO: 1300, GEO: 0, HEO: 700 } },
-      { name: "ULA Vulcan", id: "vulcan", reliability: 0.98, dedicatedBaseUSD: 110000000, rideshareUSDkg: 15000, leadMonths: 10, sites: ["CCSFS SLC-41 (FL)"], capacities: { LEO: 27000, SSO: 18000, MEO: 9000, GTO: 14000, GEO: 6000, HEO: 6000 } },
-      { name: "Firefly Alpha", id: "alpha", reliability: 0.85, dedicatedBaseUSD: 15000000, rideshareUSDkg: 18000, leadMonths: 7, sites: ["VAFB SLC-2 (CA)", "CCSFS SLC-20 (FL)"], capacities: { LEO: 1170, SSO: 740, MEO: 200, GTO: 300, GEO: 0, HEO: 250 } },
-      { name: "Blue Origin New Glenn", id: "newglenn", reliability: 0.90, dedicatedBaseUSD: 85000000, rideshareUSDkg: 13000, leadMonths: 10, sites: ["CCSFS LC-36 (FL)"], capacities: { LEO: 45000, SSO: 25000, MEO: 12000, GTO: 13000, GEO: 6000, HEO: 7000 } },
-    ];
-
-    function clamp(v,min,max){ return Math.max(min,Math.min(max,v)); }
-    function estimateCost(provider, kg, mode){
-      if(mode==="rideshare") return Math.max(Math.round(kg * provider.rideshareUSDkg), Math.round(Math.min(provider.dedicatedBaseUSD * 0.15, kg * provider.rideshareUSDkg * 1.2)));
-      const fill = clamp(kg / (provider.capacities.LEO || kg), 0.1, 1);
-      const scaler = 0.6 + 0.6 * fill;
-      return Math.round(provider.dedicatedBaseUSD * scaler);
-    }
-    function capacityForOrbit(provider, orbitKey){ return provider.capacities[orbitKey]||0 }
-    function feasible(provider, kg, orbitKey){ return capacityForOrbit(provider, orbitKey) >= kg * 1.05; }
-    function scoreProvider(provider, inputs){
-      const { payloadKg, orbitKey, budgetUSD, mode, netMonths, risk } = inputs;
-      if(!feasible(provider,payloadKg,orbitKey)) return -Infinity;
-      const cost = estimateCost(provider,payloadKg,mode);
-      const costScore = 1 - clamp((cost - budgetUSD) / (budgetUSD * 0.75), 0, 1);
-      const relScore = provider.reliability * (1 - 0.3 * risk);
-      const schedScore = 1 - clamp((provider.leadMonths - netMonths) / 12, 0, 1);
-      const fit = payloadKg / capacityForOrbit(provider, orbitKey);
-      const fillPenalty = Math.abs(0.75 - fit);
-      const fitScore = clamp(1 - fillPenalty * 1.2, 0, 1);
-      const total = 0.38 * costScore + 0.28 * relScore + 0.18 * schedScore + 0.16 * fitScore;
-      return total;
-    }
-    function makeOrbitDetails(orbitKey, altitudeKm, inclinationDeg){
-      const o = ORBITS.find(x=>x.key===orbitKey) || ORBITS[0];
-      const a = clamp(altitudeKm, o.range[0], o.range[1]);
-      const inc = clamp(inclinationDeg, o.typicalInc[0], o.typicalInc[1]);
-      const mu = 398600.4418; const Re = 6378.137;
-      const r = Re + a;
-      const T = 2 * Math.PI * Math.sqrt((r*r*r)/mu);
-      const periodMin = (orbitKey==="LEO"||orbitKey==="SSO") ? Math.round(T/60) : undefined;
-      return { name:o.name, altitudeKm:a, inclinationDeg:inc, periodMin, notes:o.notes };
-    }
-
-    /***** DOM Helpers & App State *****/
-    const state = {
-      mission:"Aurora-1",
-      payloadKg:120,
-      orbitKey:"SSO",
-      altitudeKm:525,
-      inclination:97,
-      mode:"rideshare",
-      budgetUSD:6000000,
-      netMonths:7,
-      risk:0.3
-    };
+    const rideshare = {name:'SpaceX Smallsat Rideshare (Transporter/Bandwagon)', base_includes_kg:50, base_price:325000, extra_per_kg:6500};
 
     // DOM refs
-    const missionInput = document.getElementById('mission-input');
-    const payloadInput = document.getElementById('payload-input');
-    const payloadRange = document.getElementById('payload-range');
-    const orbitButtons = document.getElementById('orbit-buttons');
-    const orbitNote = document.getElementById('orbit-note');
-    const altitudeInput = document.getElementById('altitude-input');
-    const altitudeRange = document.getElementById('altitude-range');
-    const inclinationInput = document.getElementById('inclination-input');
-    const inclinationRange = document.getElementById('inclination-range');
-    const orbitBadge = document.getElementById('orbit-badge');
-    const orbitSketch = document.getElementById('orbit-sketch');
-    const orbitAlt = document.getElementById('orbit-alt');
-    const orbitInc = document.getElementById('orbit-inc');
-    const orbitPeriod = document.getElementById('orbit-period');
-    const modeToggle = document.getElementById('mode-toggle');
-    const budgetInput = document.getElementById('budget-input');
-    const budgetRange = document.getElementById('budget-range');
-    const netInput = document.getElementById('net-input');
-    const riskRange = document.getElementById('risk-range');
-    const providersList = document.getElementById('providers-list');
-    const costRangeEl = document.getElementById('cost-range');
-    const barChart = document.getElementById('bar-chart');
-    const pieChart = document.getElementById('pie-chart');
-    const resetBtn = document.getElementById('reset-btn');
-    const printBtn = document.getElementById('print-btn');
-    const generateFullBtn = document.getElementById('generate-full');
+    const payloadEl = document.getElementById('payload');
+    const altEl = document.getElementById('alt'); const altVal = document.getElementById('altVal');
+    const incEl = document.getElementById('inc'); const incVal = document.getElementById('incVal');
+    const eccEl = document.getElementById('ecc'); const eccVal = document.getElementById('eccVal');
+    const presets = document.getElementById('orbitPresets');
+    const priorityGroup = document.getElementById('priorityGroup');
+    const planBtn = document.getElementById('planBtn');
+    const resultsEl = document.getElementById('results');
+    const selectedOrbitEl = document.getElementById('selectedOrbit');
 
-    /***** Initialization & UI wiring *****/
-    function init(){
-      // populate orbit buttons
-      ORBITS.forEach(o=>{
-        const b = document.createElement('div');
-        b.className = 'pill';
-        b.textContent = o.key;
-        b.dataset.key = o.key;
-        b.style.cursor='pointer';
-        b.addEventListener('click', ()=> {
-          state.orbitKey = o.key;
-          state.altitudeKm = o.defaultAlt;
-          state.inclination = o.typicalInc[0];
-          syncUI();
-          rerender();
-        });
-        orbitButtons.appendChild(b);
+    // selected state
+    let selectedPreset = 'LEO';
+    let selectedPriority = 'cost';
+
+    // toggle helpers
+    presets.addEventListener('click', (e)=>{
+      const b = e.target.closest('button'); if(!b) return;
+      // mark selected
+      [...presets.querySelectorAll('button')].forEach(btn=>btn.classList.remove('primary'));
+      b.classList.add('primary');
+      selectedPreset = b.dataset.preset;
+
+      // quick preset behaviours
+      if(selectedPreset==='SSO'){ incEl.value = 97; altEl.value = 600; }
+      else if(selectedPreset==='LEO'){ incEl.value = 51.6; altEl.value = 600; }
+      else if(selectedPreset==='ISS'){ incEl.value = 51.6; altEl.value = 408; }
+      else if(selectedPreset==='Polar'){ incEl.value = 90; altEl.value = 600; }
+      else if(selectedPreset==='GEO'){ incEl.value = 0; altEl.value = 35786; }
+      else if(selectedPreset==='GTO'){ incEl.value = 27; altEl.value = 25000; }
+      else if(selectedPreset==='HEO'){ incEl.value = 63.4; altEl.value = 1000; }
+      else if(selectedPreset==='MEO'){ incEl.value = 56; altEl.value = 20000; }
+
+      updateOrbitDisplay(); drawOrbitOnGlobe();
+    });
+
+    priorityGroup.addEventListener('click',(e)=>{ const b=e.target.closest('button'); if(!b) return; [...priorityGroup.querySelectorAll('button')].forEach(btn=>btn.classList.remove('primary')); b.classList.add('primary'); selectedPriority = b.dataset.priority; });
+
+    // sliders
+    function updateOrbitDisplay(){ altVal.innerText = Number(altEl.value).toLocaleString(); incVal.innerText = Number(incEl.value); eccVal.innerText = Number(eccEl.value).toFixed(2);
+      selectedOrbitEl.innerText = `${selectedPreset} — ${altVal.innerText} km, ${incVal.innerText}° (e=${eccVal.innerText})`;
+    }
+    altEl.addEventListener('input', ()=>{ selectedPreset='Custom'; [...presets.querySelectorAll('button')].forEach(btn=>btn.classList.remove('primary')); updateOrbitDisplay(); drawOrbitOnGlobe(); });
+    incEl.addEventListener('input', ()=>{ selectedPreset='Custom'; [...presets.querySelectorAll('button')].forEach(btn=>btn.classList.remove('primary')); updateOrbitDisplay(); drawOrbitOnGlobe(); });
+    eccEl.addEventListener('input', ()=>{ selectedPreset='Custom'; [...presets.querySelectorAll('button')].forEach(btn=>btn.classList.remove('primary')); updateOrbitDisplay(); drawOrbitOnGlobe(); });
+
+    // initialize display
+    document.querySelector('[data-preset="LEO"]').classList.add('primary'); document.querySelector('[data-priority="cost"]').classList.add('primary'); updateOrbitDisplay();
+
+    // compute / render results
+    function money(n){ return n>=1000000 ? '$'+(n/1000000).toFixed(2)+'M' : '$'+n.toLocaleString(); }
+    function formatKg(n){ return n.toLocaleString()+' kg'; }
+
+    function compute(){
+      const payload = Number(payloadEl.value||0); if(!payload||payload<=0){ resultsEl.innerHTML=''; alert('Enter payload mass > 0 kg'); return; }
+      const altitude = Number(altEl.value); const inclination = Number(incEl.value);
+      // build matches
+      const matches = [];
+      providers.forEach(v=>{
+        // choose capacity based on rough orbit class
+        let orbitKey = 'LEO'; if(altitude>2000 && altitude<35786) orbitKey='MEO'; if(altitude>=35786) orbitKey='GTO';
+        // special mapping for user clarity
+        if(selectedPreset==='GTO') orbitKey='GTO';
+        if(selectedPreset==='GEO') orbitKey='GTO';
+        const cap = v.payload[orbitKey] || v.payload['LEO'];
+        const fits = payload<=cap;
+        const costEstimate = Math.max(v.price, Math.round((payload / Math.max(1, cap)) * v.price));
+        const costPerKg = (costEstimate/Math.max(1,payload));
+        matches.push({type:'dedicated', id:v.id, vehicle:v.name, provider:v.provider, capacity:cap, fits, price:v.price, estimate:costEstimate, costPerKg, notes:v.notes});
       });
 
-      // mode toggle
-      Array.from(modeToggle.children).forEach(node=>{
-        node.addEventListener('click', ()=> {
-          state.mode = node.dataset.mode;
-          syncUI();
-          rerender();
-        });
-      });
+      if(payload<=2000){ let cost=0; if(payload<=rideshare.base_includes_kg) cost=rideshare.base_price; else cost=rideshare.base_price+Math.ceil(payload-rideshare.base_includes_kg)*rideshare.extra_per_kg; matches.push({type:'rideshare', id:'spacex_rideshare', vehicle:rideshare.name, provider:'SpaceX', capacity:'various (shared)', fits:true, price:cost, estimate:cost, costPerKg:cost/payload, notes:'Rideshare - manifest & schedule dependent.'}); }
 
-      // inputs binding
-      missionInput.addEventListener('input', e=> { state.mission = e.target.value; });
-      payloadInput.addEventListener('input', e=> { state.payloadKg = Number(e.target.value||0); payloadRange.value = state.payloadKg; rerender(); });
-      payloadRange.addEventListener('input', e=> { state.payloadKg = Number(e.target.value||0); payloadInput.value = state.payloadKg; rerender(); });
-
-      altitudeInput.addEventListener('input', e=> { state.altitudeKm = Number(e.target.value||0); altitudeRange.value = state.altitudeKm; syncOrbitInfo(); rerender(); });
-      altitudeRange.addEventListener('input', e=> { state.altitudeKm = Number(e.target.value||0); altitudeInput.value = state.altitudeKm; syncOrbitInfo(); rerender(); });
-
-      inclinationInput.addEventListener('input', e=> { state.inclination = Number(e.target.value||0); inclinationRange.value = state.inclination; syncOrbitInfo(); rerender(); });
-      inclinationRange.addEventListener('input', e=> { state.inclination = Number(e.target.value||0); inclinationInput.value = state.inclination; syncOrbitInfo(); rerender(); });
-
-      budgetInput.addEventListener('input', e=> { state.budgetUSD = Number(e.target.value||0); budgetRange.value = state.budgetUSD; rerender(); });
-      budgetRange.addEventListener('input', e=> { state.budgetUSD = Number(e.target.value||0); budgetInput.value = state.budgetUSD; rerender(); });
-
-      netInput.addEventListener('input', e=> { state.netMonths = Number(e.target.value||0); rerender(); });
-      riskRange.addEventListener('input', e=> { state.risk = Number(e.target.value||0); rerender(); });
-
-      resetBtn.addEventListener('click', resetState);
-      printBtn.addEventListener('click', ()=> window.print());
-      generateFullBtn.addEventListener('click', ()=> window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' }));
-
-      // initial UI sync
-      syncUI();
-      rerender();
+      if(selectedPriority==='cost') matches.sort((a,b)=>a.estimate-b.estimate); else if(selectedPriority==='capacity') matches.sort((a,b)=>(b.capacity||0)-(a.capacity||0));
+      render(matches,payload,altitude,inclination);
+      drawOrbitOnGlobe();
     }
 
-    function syncUI(){
-      missionInput.value = state.mission;
-      payloadInput.value = state.payloadKg; payloadRange.value = state.payloadKg;
-      altitudeInput.value = state.altitudeKm; altitudeRange.value = state.altitudeKm;
-      inclinationInput.value = state.inclination; inclinationRange.value = state.inclination;
-      budgetInput.value = state.budgetUSD; budgetRange.value = state.budgetUSD;
-      netInput.value = state.netMonths; riskRange.value = state.risk;
+    function render(list,payload,altitude,inclination){ resultsEl.innerHTML=''; list.forEach(item=>{
+      const el=document.createElement('div'); el.className='card'; const h=document.createElement('h3'); h.innerText=item.vehicle+' — '+item.provider; el.appendChild(h);
+      const meta=document.createElement('div'); meta.className='small'; meta.style.marginTop='8px'; meta.innerHTML=`Est. cost: <strong>${money(item.estimate)}</strong> · Cost/kg: <strong>${item.costPerKg?('$'+Number(item.costPerKg).toFixed(0)):'—'}</strong>`; el.appendChild(meta);
+      const row=document.createElement('div'); row.style.display='flex'; row.style.justifyContent='space-between'; row.style.marginTop='10px'; row.innerHTML=`<div class='small'>Capacity: ${typeof item.capacity==='number'?formatKg(item.capacity):item.capacity}</div><div class='small'>${item.fits? 'Payload fits':'<strong>Will not fit</strong>'}</div>`; el.appendChild(row);
+      const bar=document.createElement('div'); bar.className='bar'; bar.style.marginTop='8px'; if(typeof item.capacity==='number'){ const pct=Math.min(100,Math.round((payload/item.capacity)*100)); const inner=document.createElement('i'); inner.style.display='block'; inner.style.height='10px'; inner.style.borderRadius='999px'; inner.style.width=pct+'%'; inner.style.background='linear-gradient(90deg,var(--accent-start,var(--accent-end)))'; inner.style.background='linear-gradient(90deg,'+getComputedStyle(document.documentElement).getPropertyValue('--accent-start')+','+getComputedStyle(document.documentElement).getPropertyValue('--accent-end')+')'; bar.appendChild(inner); el.appendChild(bar); const p=document.createElement('div'); p.className='small'; p.style.marginTop='6px'; p.innerText=`${Math.min(100,Math.round((payload/item.capacity)*100))}% of capacity used`; el.appendChild(p); }
+      const note=document.createElement('div'); note.className='small'; note.style.marginTop='8px'; note.innerText=item.notes; el.appendChild(note);
+      const actions=document.createElement('div'); actions.style.marginTop='10px'; const b=document.createElement('button'); b.className='btn primary'; b.innerText='Select configuration'; b.onclick=()=>selectConfiguration(item,payload,altitude,inclination); actions.appendChild(b); el.appendChild(actions);
+      resultsEl.appendChild(el);
+    }); }
 
-      // mode pills styling
-      Array.from(modeToggle.children).forEach(n=>{
-        if(n.dataset.mode===state.mode){ n.style.background='white'; n.style.color='#071028'; n.style.fontWeight='700'; } else { n.style.background='transparent'; n.style.color='inherit'; n.style.fontWeight='400'; }
-      });
+    function selectConfiguration(item,payload,altitude,inclination){ const details = `Selected: ${item.vehicle} (${item.provider})
+Payload: ${payload} kg
+Orbit: ${selectedPreset} — ${altitude} km, ${inclination}°
+Est. cost: ${money(item.estimate)}
+Notes: ${item.notes}`; alert(details); }
 
-      // orbit badge and notes
-      orbitBadge.textContent = state.orbitKey;
-      const orbitObj = ORBITS.find(o=>o.key===state.orbitKey);
-      orbitNote.textContent = orbitObj ? orbitObj.notes : '';
-      // range limits for altitude slider
-      const rng = orbitObj ? orbitObj.range : [1,100000];
-      altitudeRange.min = rng[0]; altitudeRange.max = rng[1];
+    planBtn.addEventListener('click', compute);
+    document.getElementById('resetBtn').addEventListener('click', ()=>{ payloadEl.value=150; altEl.value=600; incEl.value=97; eccEl.value=0; selectedPreset='LEO'; [...presets.querySelectorAll('button')].forEach(btn=>btn.classList.remove('primary')); document.querySelector('[data-preset="LEO"]').classList.add('primary'); selectedPriority='cost'; [...priorityGroup.querySelectorAll('button')].forEach(btn=>btn.classList.remove('primary')); document.querySelector('[data-priority="cost"]').classList.add('primary'); updateOrbitDisplay(); resultsEl.innerHTML=''; drawOrbitOnGlobe(); });
+
+    // === Globe (Three.js) ===
+    let scene, camera, renderer, controls; let earthMesh; let orbitGroup;
+    const R_EARTH = 6371; // km
+    function initGlobe(){ const container=document.getElementById('globe'); scene=new THREE.Scene(); camera=new THREE.PerspectiveCamera(45, container.clientWidth/container.clientHeight, 0.1, 1000); camera.position.set(0, -8, 4);
+      renderer=new THREE.WebGLRenderer({antialias:true,alpha:true}); renderer.setSize(container.clientWidth, container.clientHeight); renderer.setPixelRatio(window.devicePixelRatio); container.innerHTML=''; container.appendChild(renderer.domElement);
+      controls=new THREE.OrbitControls(camera, renderer.domElement); controls.enableDamping=true; controls.minDistance=2; controls.maxDistance=40;
+      const light=new THREE.DirectionalLight(0xffffff, 1); light.position.set(5,3,5); scene.add(light); scene.add(new THREE.AmbientLight(0x888888,0.6));
+      const geo=new THREE.SphereGeometry(1.4, 64, 64);
+      const mat=new THREE.MeshStandardMaterial({color:0x0b3a5a, metalness:0.1, roughness:0.8});
+      earthMesh=new THREE.Mesh(geo, mat); scene.add(earthMesh);
+      // subtle surface shading lines
+      const grid=new THREE.LineSegments(new THREE.EdgesGeometry(new THREE.SphereGeometry(1.402, 24,24)), new THREE.LineBasicMaterial({color:0x082634, opacity:0.08, transparent:true})); scene.add(grid);
+      orbitGroup=new THREE.Group(); scene.add(orbitGroup);
+      window.addEventListener('resize', onResize);
+      animate();
     }
+    function onResize(){ const container=document.getElementById('globe'); camera.aspect = container.clientWidth/container.clientHeight; camera.updateProjectionMatrix(); renderer.setSize(container.clientWidth, container.clientHeight); }
+    function animate(){ requestAnimationFrame(animate); controls.update(); renderer.render(scene, camera); }
 
-    function resetState(){
-      state.mission="Aurora-1";
-      state.payloadKg=120;
-      state.orbitKey="SSO";
-      state.altitudeKm=525;
-      state.inclination=97;
-      state.mode="rideshare";
-      state.budgetUSD=6000000;
-      state.netMonths=7;
-      state.risk=0.3;
-      syncUI();
-      rerender();
-    }
-
-    /***** Rendering & Recommendation logic *****/
-    function computeRecommendations(){
-      const scored = PROVIDERS.map(p=>{
-        const cost = estimateCost(p, state.payloadKg, state.mode);
-        const cap = capacityForOrbit(p, state.orbitKey);
-        const score = scoreProvider(p, { payloadKg: state.payloadKg, orbitKey: state.orbitKey, budgetUSD: state.budgetUSD, mode: state.mode, netMonths: state.netMonths, risk: state.risk });
-        return { provider:p, cost, cap, score };
-      }).filter(x=>x.score !== -Infinity).sort((a,b)=>b.score - a.score).slice(0,6);
-      return scored;
-    }
-
-    function rerender(){
-      // orbit info
-      const o = makeOrbitDetails(state.orbitKey, state.altitudeKm, state.inclination);
-      orbitAlt.textContent = Math.round(o.altitudeKm) + ' km';
-      orbitInc.textContent = Math.round(o.inclinationDeg) + '°';
-      orbitPeriod.textContent = o.periodMin ? `~${o.periodMin} min` : 'n/a';
-      renderOrbitSketch(state.altitudeKm, state.inclination, state.orbitKey);
-
-      // providers
-      const ranked = computeRecommendations();
-      providersList.innerHTML = '';
-      if(!ranked.length){
-        providersList.textContent = 'No feasible providers found. Try lowering mass, changing orbit, or increasing budget/NET.';
-      } else {
-        // cost range
-        const costs = ranked.map(r=>r.cost);
-        costRangeEl.textContent = formatUSD(Math.min(...costs)) + ' – ' + formatUSD(Math.max(...costs));
-        // render each card
-        ranked.forEach(r=>{
-          const card = document.createElement('div');
-          card.className = 'provider';
-          const meta = document.createElement('div'); meta.className='meta';
-          const left = document.createElement('div'); left.className='left';
-          const avatar = document.createElement('div'); avatar.style.width='44px'; avatar.style.height='44px'; avatar.style.borderRadius='10px'; avatar.style.background='rgba(255,255,255,0.03)'; avatar.style.display='grid'; avatar.style.placeItems='center'; avatar.style.fontWeight='700';
-          avatar.textContent = r.provider.name.split(' ')[0][0] || 'R';
-          left.appendChild(avatar);
-          const info = document.createElement('div'); info.style.display='flex'; info.style.flexDirection='column';
-          const title = document.createElement('div'); title.style.fontWeight='700'; title.textContent = r.provider.name;
-          const sub = document.createElement('div'); sub.className='small muted'; sub.textContent = `Cap: ${r.cap.toLocaleString()} kg • Rel: ${(r.provider.reliability*100).toFixed(1)}% • Lead: ${r.provider.leadMonths}mo`;
-          info.appendChild(title); info.appendChild(sub);
-          left.appendChild(info);
-          meta.appendChild(left);
-
-          const right = document.createElement('div'); right.style.textAlign='right';
-          const costEl = document.createElement('div'); costEl.style.fontWeight='700'; costEl.textContent = formatUSD(r.cost);
-          const scoreEl = document.createElement('div'); scoreEl.className='small muted'; scoreEl.textContent = `Score ${(r.score*100).toFixed(0)}`;
-          const exportBtn = document.createElement('button'); exportBtn.className='btn'; exportBtn.style.marginTop='8px'; exportBtn.textContent='Export';
-          exportBtn.addEventListener('click', ()=> exportPlan(r));
-          right.appendChild(costEl); right.appendChild(scoreEl); right.appendChild(exportBtn);
-          meta.appendChild(right);
-
-          card.appendChild(meta);
-
-          const grid = document.createElement('div'); grid.style.display='grid'; grid.style.gridTemplateColumns='1fr 1fr 1fr'; grid.style.gap='8px'; grid.style.marginTop='8px';
-          // sites
-          const c1 = document.createElement('div'); c1.style.padding='8px'; c1.style.borderRadius='8px'; c1.style.background='rgba(255,255,255,0.02)'; c1.innerHTML = `<div class="small muted">Best launch sites</div><div style="margin-top:6px">${r.provider.sites.map(s=>'<div style="display:inline-block;margin:4px;padding:6px 8px;border-radius:8px;background:rgba(255,255,255,0.03);font-size:12px">'+s+'</div>').join('')}</div>`;
-          // why fits
-          const c2 = document.createElement('div'); c2.style.padding='8px'; c2.style.borderRadius='8px'; c2.style.background='rgba(255,255,255,0.02)';
-          const capMargin = (100 - (state.payloadKg / r.cap) * 100).toFixed(1);
-          c2.innerHTML = `<div class="small muted">Why it fits</div><ul style="margin:8px 0 0 18px"><li>Capacity margin: ${capMargin}%</li><li>${state.mode==='rideshare' ? 'Competitive rideshare $/kg' : 'Efficient dedicated price for mass'}</li><li>Schedule: ${state.netMonths >= r.provider.leadMonths ? 'meets' : (r.provider.leadMonths - state.netMonths)+' mo late'}</li></ul>`;
-          // mission profile
-          const c3 = document.createElement('div'); c3.style.padding='8px'; c3.style.borderRadius='8px'; c3.style.background='rgba(255,255,255,0.02)';
-          c3.innerHTML = `<div class="small muted">Mission profile</div><div style="margin-top:6px">${o.name}<br>${Math.round(state.altitudeKm)} km @ ${Math.round(state.inclination)}°<br>Mode: ${state.mode}</div>`;
-
-          grid.appendChild(c1); grid.appendChild(c2); grid.appendChild(c3);
-          card.appendChild(grid);
-
-          providersList.appendChild(card);
-        });
+    // draw circular orbit as a tilted ring representing approximate altitude & inclination
+    function drawOrbitOnGlobe(){ if(!scene) return; // clear old
+      while(orbitGroup.children.length) orbitGroup.remove(orbitGroup.children[0]);
+      const altitude = Number(altEl.value); const inclination = Number(incEl.value); const ecc = Number(eccEl.value);
+      const a_km = R_EARTH + altitude; const scale = 1.4 / (R_EARTH + 35786) * (a_km + 2000); // scale mapping to sphere
+      // we'll draw up to 3 revolutions as ground track ring
+      const segments = 256; const positions = [];
+      for(let i=0;i<=segments;i++){
+        const theta = (i/segments)*Math.PI*2;
+        // base circle in x-y plane radius depends on scaled a
+        const x = Math.cos(theta) * (scale);
+        const y = Math.sin(theta) * (scale);
+        const z = 0;
+        positions.push(new THREE.Vector3(x,y,z));
       }
-
-      // charts
-      renderBarChart(ranked);
-      renderPieChart(ranked);
+      // create geometry and rotate to inclination about x-axis
+      const curve = new THREE.CatmullRomCurve3(positions);
+      const pts = curve.getPoints(segments);
+      // apply inclination rotation
+      const inclRad = THREE.MathUtils.degToRad(inclination);
+      pts.forEach(p=>{ const y=p.y; const z=p.z; // rotate around x
+        const newY = y*Math.cos(inclRad) - z*Math.sin(inclRad);
+        const newZ = y*Math.sin(inclRad) + z*Math.cos(inclRad);
+        p.y = newY; p.z = newZ; });
+      const geom = new THREE.BufferGeometry().setFromPoints(pts);
+      const mat = new THREE.LineBasicMaterial({color:0x7b61ff, linewidth:2, transparent:true, opacity:0.95}); const line = new THREE.LineLoop(geom, mat);
+      orbitGroup.add(line);
+      // add marker for ascending node
+      const ascGeo = new THREE.SphereGeometry(0.03,8,8); const ascMat = new THREE.MeshStandardMaterial({color:0x4fd1c5}); const asc = new THREE.Mesh(ascGeo, ascMat);
+      // choose ascending node at theta=0 -> point approx positions[0]
+      const ascPt = pts[0].clone(); asc.position.copy(ascPt); orbitGroup.add(asc);
     }
 
-    function formatUSD(n){ return '$' + Number(n).toLocaleString(); }
+    // create globe and initial orbit
+    initGlobe(); drawOrbitOnGlobe();
 
-    /***** Simple SVG Charts (no external libs) *****/
-    function renderBarChart(ranked){
-      const svg = barChart;
-      const width = 320, height = 160, padding = 28;
-      svg.setAttribute('viewBox', `0 0 ${width} ${height}`);
-      while(svg.firstChild) svg.removeChild(svg.firstChild);
-
-      if(ranked.length===0){
-        const t = document.createElementNS('http://www.w3.org/2000/svg','text');
-        t.setAttribute('x',width/2); t.setAttribute('y',height/2); t.setAttribute('text-anchor','middle');
-        t.setAttribute('fill','#A6B2C8'); t.textContent='No data';
-        svg.appendChild(t); return;
-      }
-      const costs = ranked.map(r=>r.cost);
-      const max = Math.max(...costs) * 1.1;
-      const barW = (width - padding*2) / costs.length * 0.7;
-      ranked.forEach((r,i)=>{
-        const x = padding + i * ((width - padding*2) / costs.length) + ((width - padding*2) / costs.length - barW)/2;
-        const h = (r.cost / max) * (height - padding*1.6);
-        const y = height - padding - h;
-        const rect = document.createElementNS('http://www.w3.org/2000/svg','rect');
-        rect.setAttribute('x',x); rect.setAttribute('y',y); rect.setAttribute('width',barW); rect.setAttribute('height',h);
-        rect.setAttribute('rx',6); rect.setAttribute('fill','#E6EEF8'); rect.setAttribute('opacity',0.9);
-        svg.appendChild(rect);
-
-        // label
-        const lab = document.createElementNS('http://www.w3.org/2000/svg','text');
-        lab.setAttribute('x', x + barW/2); lab.setAttribute('y', height - padding + 14);
-        lab.setAttribute('text-anchor','middle'); lab.setAttribute('fill','#A6B2C8'); lab.setAttribute('font-size',10);
-        lab.textContent = r.provider.name.split(' ')[0];
-        svg.appendChild(lab);
-      });
-    }
-
-    function renderPieChart(ranked){
-      const svg = pieChart;
-      const size = 160, cx = size/2, cy = size/2, r = 48;
-      svg.setAttribute('viewBox',`0 0 ${size} ${size}`);
-      while(svg.firstChild) svg.removeChild(svg.firstChild);
-
-      if(ranked.length===0){
-        const t = document.createElementNS('http://www.w3.org/2000/svg','text');
-        t.setAttribute('x',size/2); t.setAttribute('y',size/2); t.setAttribute('text-anchor','middle');
-        t.setAttribute('fill','#A6B2C8'); t.textContent='No data';
-        svg.appendChild(t); return;
-      }
-
-      // compute slices from payload/capacity ratio, normalized
-      const vals = ranked.map(r=>clamp(state.payloadKg / r.cap, 0, 1));
-      const total = vals.reduce((a,b)=>a+b,0) || 1;
-      let start = -Math.PI/2;
-      vals.forEach((v,i)=>{
-        const angle = (v/total) * Math.PI*2;
-        const end = start + angle;
-        const x1 = cx + r*Math.cos(start);
-        const y1 = cy + r*Math.sin(start);
-        const x2 = cx + r*Math.cos(end);
-        const y2 = cy + r*Math.sin(end);
-        const large = angle > Math.PI ? 1:0;
-        const d = `M ${cx} ${cy} L ${x1} ${y1} A ${r} ${r} 0 ${large} 1 ${x2} ${y2} Z`;
-        const path = document.createElementNS('http://www.w3.org/2000/svg','path');
-        path.setAttribute('d',d);
-        path.setAttribute('fill', `hsl(${(i*55) % 360} 70% 70%)`);
-        path.setAttribute('opacity',0.95);
-        svg.appendChild(path);
-
-        // label
-        const mid = start + angle/2;
-        const lx = cx + (r+18) * Math.cos(mid);
-        const ly = cy + (r+18) * Math.sin(mid);
-        const text = document.createElementNS('http://www.w3.org/2000/svg','text');
-        text.setAttribute('x',lx); text.setAttribute('y',ly); text.setAttribute('fill','#E6EEF8'); text.setAttribute('font-size',10);
-        text.setAttribute('text-anchor', mid>Math.PI/2 && mid < 3*Math.PI/2 ? 'end' : 'start');
-        text.textContent = `${ranked[i].provider.name.split(' ')[0]} ${(v*100).toFixed(0)}%`;
-        svg.appendChild(text);
-
-        start = end;
-      });
-    }
-
-    /***** Orbit sketch (SVG) *****/
-    function renderOrbitSketch(altitudeKm, inclinationDeg, orbitKey){
-      const svg = orbitSketch;
-      const size = 220;
-      const center = size/2;
-      const Re = 30;
-      const r = 50 + Math.log10(Math.max(10, altitudeKm)) * 18;
-      const incTilt = (inclinationDeg / 180) * Math.PI;
-      while(svg.firstChild) svg.removeChild(svg);
-      // earth
-      const defs = document.createElementNS('http://www.w3.org/2000/svg','defs');
-      const g = document.createElementNS('http://www.w3.org/2000/svg','radialGradient');
-      g.id = 'grad1';
-      const s1 = document.createElementNS('http://www.w3.org/2000/svg','stop'); s1.setAttribute('offset','0%'); s1.setAttribute('stop-color','#fff'); s1.setAttribute('stop-opacity','0.9');
-      const s2 = document.createElementNS('http://www.w3.org/2000/svg','stop'); s2.setAttribute('offset','100%'); s2.setAttribute('stop-color','#fff'); s2.setAttribute('stop-opacity','0.15');
-      g.appendChild(s1); g.appendChild(s2); defs.appendChild(g); svg.appendChild(defs);
-      const earth = document.createElementNS('http://www.w3.org/2000/svg','circle');
-      earth.setAttribute('cx',center); earth.setAttribute('cy',center); earth.setAttribute('r',Re); earth.setAttribute('fill','url(#grad1)');
-      svg.appendChild(earth);
-      // orbit ellipse
-      const rx = r;
-      const ry = Math.max(12, r * Math.cos(incTilt));
-      const ellipse = document.createElementNS('http://www.w3.org/2000/svg','ellipse');
-      ellipse.setAttribute('cx',center); ellipse.setAttribute('cy',center); ellipse.setAttribute('rx',rx); ellipse.setAttribute('ry',ry);
-      ellipse.setAttribute('fill','none'); ellipse.setAttribute('stroke','rgba(255,255,255,0.6)'); ellipse.setAttribute('stroke-width','2');
-      svg.appendChild(ellipse);
-      // satellite marker
-      const satX = center + rx; const satY = center;
-      const sat = document.createElementNS('http://www.w3.org/2000/svg','circle');
-      sat.setAttribute('cx',satX); sat.setAttribute('cy',satY); sat.setAttribute('r',3); sat.setAttribute('fill','#fff');
-      svg.appendChild(sat);
-    }
-
-    /***** Export plan *****/
-    function exportPlan(rec){
-      const payload = {
-        generatedAt: new Date().toISOString(),
-        mission: missionInput.value || state.mission,
-        payloadKg: state.payloadKg,
-        orbit: makeOrbitDetails(state.orbitKey, state.altitudeKm, state.inclination),
-        mode: state.mode,
-        budgetUSD: state.budgetUSD,
-        netMonths: state.netMonths,
-        recommendation: {
-          provider: rec.provider.name,
-          sites: rec.provider.sites,
-          estimatedCostUSD: rec.cost,
-          capacityToOrbitKg: rec.cap,
-          reliability: rec.provider.reliability,
-          leadMonths: rec.provider.leadMonths
-        },
-        notes: "All values are planning estimates for trade studies only; confirm with providers."
-      };
-      const blob = new Blob([JSON.stringify(payload, null, 2)], { type: 'application/json' });
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement('a');
-      a.href = url;
-      a.download = `${(missionInput.value||state.mission).replace(/\s+/g,'_')}_launch_plan.json`;
-      document.body.appendChild(a);
-      a.click();
-      a.remove();
-      URL.revokeObjectURL(url);
-    }
-
-    /***** Start app *****/
-    init();
-    // small initial sync in case ranges differ
-    syncUI();
-    rerender();
+    // expose draw for debugging
+    window.drawOrbitOnGlobe = drawOrbitOnGlobe;
   </script>
 </body>
 </html>
