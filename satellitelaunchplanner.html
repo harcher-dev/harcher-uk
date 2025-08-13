@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Satellite Launch Planner</title>
+  <title>Satellite Launch Planner — Liquid Glass (Buttons + Globe)</title>
   <style>
     :root{
       --bg:#0f1724;
@@ -76,7 +76,7 @@
       </div>
       <div>
         <h1>Satellite Launch Planner</h1>
-        <p class="lead">DISCLAIMER: This project was made with generative AI, I do not claim to have written any of the code.</p>
+        <p class="lead">Buttons-only UI + detailed orbit selector. Visualise chosen orbit on the globe.</p>
       </div>
     </header>
 
@@ -147,14 +147,14 @@
       </div>
     </div>
 
-    <footer style="margin-top:12px;color:var(--muted);font-size:12px"><i>Data correct as of July 2025.</i></footer>
+    <footer style="margin-top:12px;color:var(--muted);font-size:12px">This planner now uses button controls and a 3D globe. All orbit visualisations are simplified approximations for planning and illustration only.</footer>
   </div>
 
-  <!-- three.js from CDN (switched to jsDelivr to avoid Cloudflare Access redirect issues) -->
-  <script src="https://cdn.jsdelivr.net/npm/three@0.152.0/build/three.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/three@0.152.0/examples/js/controls/OrbitControls.js"></script>
+  <!-- three.js as ES modules (module import avoids MIME/type redirect issues) -->
+  <script type="module">
+    import * as THREE from 'https://cdn.jsdelivr.net/npm/three@0.152.0/build/three.module.js';
+    import { OrbitControls } from 'https://cdn.jsdelivr.net/npm/three@0.152.0/examples/jsm/controls/OrbitControls.js';
 
-  <script>
     // --- provider dataset (kept from previous version) ---
     const providers = [
       {id:'falcon9', name:'Falcon 9', provider:'SpaceX', payload:{LEO:22800,SSO:20000,GTO:8300}, price:69750000, notes:'Reusable two-stage; frequent flights; rideshare program available.'},
@@ -249,7 +249,7 @@
       const el=document.createElement('div'); el.className='card'; const h=document.createElement('h3'); h.innerText=item.vehicle+' — '+item.provider; el.appendChild(h);
       const meta=document.createElement('div'); meta.className='small'; meta.style.marginTop='8px'; meta.innerHTML=`Est. cost: <strong>${money(item.estimate)}</strong> · Cost/kg: <strong>${item.costPerKg?('$'+Number(item.costPerKg).toFixed(0)):'—'}</strong>`; el.appendChild(meta);
       const row=document.createElement('div'); row.style.display='flex'; row.style.justifyContent='space-between'; row.style.marginTop='10px'; row.innerHTML=`<div class='small'>Capacity: ${typeof item.capacity==='number'?formatKg(item.capacity):item.capacity}</div><div class='small'>${item.fits? 'Payload fits':'<strong>Will not fit</strong>'}</div>`; el.appendChild(row);
-      const bar=document.createElement('div'); bar.className='bar'; bar.style.marginTop='8px'; if(typeof item.capacity==='number'){ const pct=Math.min(100,Math.round((payload/item.capacity)*100)); const inner=document.createElement('i'); inner.style.display='block'; inner.style.height='10px'; inner.style.borderRadius='999px'; inner.style.width=pct+'%'; inner.style.background='linear-gradient(90deg,var(--accent-start,var(--accent-end)))'; inner.style.background='linear-gradient(90deg,'+getComputedStyle(document.documentElement).getPropertyValue('--accent-start')+','+getComputedStyle(document.documentElement).getPropertyValue('--accent-end')+')'; bar.appendChild(inner); el.appendChild(bar); const p=document.createElement('div'); p.className='small'; p.style.marginTop='6px'; p.innerText=`${Math.min(100,Math.round((payload/item.capacity)*100))}% of capacity used`; el.appendChild(p); }
+      const bar=document.createElement('div'); bar.className='bar'; bar.style.marginTop='8px'; if(typeof item.capacity==='number'){ const pct=Math.min(100,Math.round((payload/item.capacity)*100)); const inner=document.createElement('i'); inner.style.display='block'; inner.style.height='10px'; inner.style.borderRadius='999px'; inner.style.width=pct+'%'; inner.style.background='linear-gradient(90deg,var(--accent-start,var(--accent-end))); inner.style.background='linear-gradient(90deg,'+getComputedStyle(document.documentElement).getPropertyValue('--accent-start')+','+getComputedStyle(document.documentElement).getPropertyValue('--accent-end')+')'; bar.appendChild(inner); el.appendChild(bar); const p=document.createElement('div'); p.className='small'; p.style.marginTop='6px'; p.innerText=`${Math.min(100,Math.round((payload/item.capacity)*100))}% of capacity used`; el.appendChild(p); }
       const note=document.createElement('div'); note.className='small'; note.style.marginTop='8px'; note.innerText=item.notes; el.appendChild(note);
       const actions=document.createElement('div'); actions.style.marginTop='10px'; const b=document.createElement('button'); b.className='btn primary'; b.innerText='Select configuration'; b.onclick=()=>selectConfiguration(item,payload,altitude,inclination); actions.appendChild(b); el.appendChild(actions);
       resultsEl.appendChild(el);
@@ -269,7 +269,7 @@ Notes: ${item.notes}`; alert(details); }
     const R_EARTH = 6371; // km
     function initGlobe(){ const container=document.getElementById('globe'); scene=new THREE.Scene(); camera=new THREE.PerspectiveCamera(45, container.clientWidth/container.clientHeight, 0.1, 1000); camera.position.set(0, -8, 4);
       renderer=new THREE.WebGLRenderer({antialias:true,alpha:true}); renderer.setSize(container.clientWidth, container.clientHeight); renderer.setPixelRatio(window.devicePixelRatio); container.innerHTML=''; container.appendChild(renderer.domElement);
-      controls=new THREE.OrbitControls(camera, renderer.domElement); controls.enableDamping=true; controls.minDistance=2; controls.maxDistance=40;
+      controls=new OrbitControls(camera, renderer.domElement); controls.enableDamping=true; controls.minDistance=2; controls.maxDistance=40;
       const light=new THREE.DirectionalLight(0xffffff, 1); light.position.set(5,3,5); scene.add(light); scene.add(new THREE.AmbientLight(0x888888,0.6));
       const geo=new THREE.SphereGeometry(1.4, 64, 64);
       const mat=new THREE.MeshStandardMaterial({color:0x0b3a5a, metalness:0.1, roughness:0.8});
@@ -322,6 +322,3 @@ Notes: ${item.notes}`; alert(details); }
     // expose draw for debugging
     window.drawOrbitOnGlobe = drawOrbitOnGlobe;
   </script>
-</body>
-</html>
-
